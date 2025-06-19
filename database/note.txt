@@ -1,0 +1,37 @@
+using directory inside "database/migrations".
+
+let need a directory name "batch".
+
+create migration files -
+php artisan make:migration update_foreign_key_to_employees_table --path=database/migrations/modify
+
+run migrate -
+php artisan migrate --path=database/migrations/modify
+
+php artisan migrate:rollback -
+php artisan migrate:rollback --step=1 --path=database/migrations/primary
+
+
+php artisan make:migration add_limit_coupon_to_coupons_table --table=coupons
+
+
+=============================
+
+countries
+locations
+
+
+            $table->foreign('account_id', 'finance_expenses_account_id_foreign')->references('id')->on('finance_bank_cashes')->onDelete('set NULL');
+
+
+        Schema::table('employee_immigrations', function (Blueprint $table) {
+            $table->dropForeign('employee_immigrations_document_type_id_foreign');
+            $table->dropIfExists('employee_immigrations');
+        });
+
+
+
+        php artisan migrate --path=database/migrations/primary
+        php artisan migrate --path=database/migrations/modify
+
+
