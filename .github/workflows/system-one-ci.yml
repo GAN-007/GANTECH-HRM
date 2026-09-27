@@ -1,0 +1,34 @@
+name: HRM System-One CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  laravel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: mbstring, pdo_sqlite
+          coverage: none
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: cp .env.example .env
+      - run: php artisan key:generate
+      - name: Validate changed PHP syntax
+        run: |
+          php -l app/Services/DecisionPlane/HrSystemOneService.php
+          php -l app/Services/DecisionPlane/HrDecisionPlane.php
+          php -l app/Http/Controllers/SupportTicketController.php
+          php -l config/system_one.php
+          php -l tests/Unit/HrDecisionPlaneTest.php
+      - name: Run decision-plane tests
+        run: php artisan test --filter HrDecisionPlaneTest
