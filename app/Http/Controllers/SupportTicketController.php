@@ -9,6 +9,7 @@ use App\Notifications\TicketCreatedNotification;
 use App\Notifications\TicketUpdatedNotification;
 use App\Models\SupportTicket;
 use App\Models\User;
+use App\Services\DecisionPlane\HrDecisionPlane;
 use DB;
 use Exception;
 use Illuminate\Http\Request;
@@ -182,7 +183,20 @@ class SupportTicketController extends Controller {
 				Notification::send($notificable, new TicketCreatedNotification($ticket));
 			}
 
-			return response()->json(['success' => __('Data Added successfully.')]);
+			$systemOne = app(HrDecisionPlane::class)->classify([
+				'subject' => $ticket->subject,
+				'description' => $ticket->description,
+				'note' => $ticket->ticket_note,
+				'priority' => $ticket->ticket_priority,
+				'status' => $ticket->ticket_status,
+				'department_id' => $ticket->department_id,
+			]);
+			$response = ['success' => __('Data Added successfully.')];
+			if ($systemOne !== null) {
+				$response['system_one'] = $systemOne;
+			}
+
+			return response()->json($response);
 		}
 
 		return response()->json(['success' => __('You are not authorized')]);
