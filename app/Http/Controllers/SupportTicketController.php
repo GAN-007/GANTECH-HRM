@@ -8,6 +8,7 @@ use App\Models\Employee;
 use App\Notifications\TicketCreatedNotification;
 use App\Notifications\TicketUpdatedNotification;
 use App\Models\SupportTicket;
+use App\Models\HrSystemOneDecision;
 use App\Models\User;
 use App\Services\DecisionPlane\HrDecisionPlane;
 use DB;
@@ -193,6 +194,16 @@ class SupportTicketController extends Controller {
 			]);
 			$response = ['success' => __('Data Added successfully.')];
 			if ($systemOne !== null) {
+				HrSystemOneDecision::create([
+					'support_ticket_id' => $ticket->id,
+					'provider' => $systemOne['provider'] ?? 'laya',
+					'mode' => $systemOne['mode'] ?? 'shadow',
+					'advisory_only' => true,
+					'answers' => $systemOne['answers'] ?? [],
+					'routing' => $systemOne['routing'] ?? null,
+					'usage' => $systemOne['usage'] ?? null,
+					'latency_ms' => $systemOne['latency_ms'] ?? null,
+				]);
 				$response['system_one'] = $systemOne;
 			}
 
