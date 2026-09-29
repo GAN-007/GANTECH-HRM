@@ -45,6 +45,43 @@
                 </div>
 
 
+                @php($systemOne = $ticket->latestSystemOneDecision)
+                @if($systemOne)
+                    <div class="col-md-12">
+                        <div class="card border-info">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <strong>AI Triage Advisory</strong>
+                                <span class="badge badge-info">System-One / {{ strtoupper($systemOne->mode) }}</span>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-2 text-muted">
+                                    Advisory metadata only. Existing HR permissions, ticket priority/status,
+                                    approvals, recruitment decisions and management workflows remain authoritative.
+                                </p>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <strong>Domain</strong><br>
+                                        {{ data_get($systemOne->answers, 'hr_domain.choice', 'Not classified') }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Urgency score</strong><br>
+                                        {{ data_get($systemOne->answers, 'urgency.score', 'N/A') }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Human review probability</strong><br>
+                                        @php($reviewProbability = data_get($systemOne->answers, 'needs_human_review.noul'))
+                                        {{ is_numeric($reviewProbability) ? number_format(((float) $reviewProbability) * 100, 1).'%' : 'N/A' }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Inference latency</strong><br>
+                                        {{ $systemOne->latency_ms !== null ? $systemOne->latency_ms.' ms' : 'N/A' }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
                 <div class="col-md-12">
 
                     <div class="card">
