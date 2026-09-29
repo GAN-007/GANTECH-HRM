@@ -74,6 +74,8 @@ class HrDecisionPlane
             'questions' => $questions,
         ];
 
+        $started = microtime(true);
+
         try {
             $request = Http::acceptJson()
                 ->asJson()
@@ -101,7 +103,8 @@ class HrDecisionPlane
                 'advisory_only' => true,
                 'answers' => $body['answers'],
                 'routing' => $body['routing'] ?? null,
-                'usage' => $body['usage'] ?? null,
+                'usage' => is_array($body['usage'] ?? null) ? $body['usage'] : null,
+                'latency_ms' => (int) round((microtime(true) - $started) * 1000),
             ];
         } catch (ConnectionException $exception) {
             Log::notice('HRM System-One connection failed open.', ['message' => $exception->getMessage()]);
