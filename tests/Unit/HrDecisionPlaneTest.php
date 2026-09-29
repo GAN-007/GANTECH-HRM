@@ -51,6 +51,9 @@ class HrDecisionPlaneTest extends TestCase
 
         $this->assertSame('leave', $result['answers']['hr_domain']['choice']);
         $this->assertTrue($result['advisory_only']);
+        $this->assertSame('shadow', $result['mode']);
+        $this->assertIsInt($result['latency_ms']);
+        $this->assertGreaterThanOrEqual(0, $result['latency_ms']);
 
         Http::assertSent(fn ($request) =>
             $request->url() === 'http://laya.test:8000/v1/systemone'
