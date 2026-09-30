@@ -13,6 +13,10 @@ jobs:
   laravel:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      DB_CONNECTION: sqlite
+      DB_DATABASE: ${{ github.workspace }}/database/database.sqlite
+      APP_ENV: testing
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
@@ -20,8 +24,10 @@ jobs:
           php-version: "8.2"
           extensions: mbstring, pdo_sqlite
           coverage: none
-      - name: Prepare Laravel writable paths
-        run: mkdir -p bootstrap/cache storage/framework/cache storage/framework/sessions storage/framework/views storage/logs
+      - name: Prepare Laravel writable paths and test database
+        run: |
+          mkdir -p bootstrap/cache storage/framework/cache storage/framework/sessions storage/framework/views storage/logs database
+          touch database/database.sqlite
       - run: composer install --no-interaction --prefer-dist --no-progress
       - run: cp .env.example .env
       - run: php artisan key:generate
