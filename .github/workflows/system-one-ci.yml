@@ -1,0 +1,44 @@
+name: HRM System-One CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  laravel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DB_CONNECTION: sqlite
+      DB_DATABASE: ${{ github.workspace }}/database/database.sqlite
+      APP_ENV: testing
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: mbstring, pdo_sqlite
+          coverage: none
+      - name: Prepare Laravel writable paths and test database
+        run: |
+          mkdir -p bootstrap/cache storage/framework/cache storage/framework/sessions storage/framework/views storage/logs database
+          touch database/database.sqlite
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: cp .env.example .env
+      - run: php artisan key:generate
+      - name: Validate changed PHP syntax
+        run: |
+          php -l app/Services/DecisionPlane/HrDecisionPlane.php
+          php -l app/Models/HrSystemOneDecision.php
+          php -l app/Models/SupportTicket.php
+          php -l database/migrations/2026_09_27_210000_create_hr_system_one_decisions_table.php
+          php -l app/Http/Controllers/SupportTicketController.php
+          php -l config/system_one.php
+          php -l tests/Unit/HrDecisionPlaneTest.php
+      - name: Run decision-plane tests
+        run: php artisan test --filter HrDecisionPlaneTest

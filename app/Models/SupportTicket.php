@@ -28,6 +28,14 @@ class SupportTicket extends Model
 		return $this->belongsToMany(Employee::class);
 	}
 
+	public function systemOneDecisions(){
+		return $this->hasMany(HrSystemOneDecision::class, 'support_ticket_id')->latest();
+	}
+
+	public function latestSystemOneDecision(){
+		return $this->hasOne(HrSystemOneDecision::class, 'support_ticket_id')->latestOfMany();
+	}
+
 
 	public function getRouteKeyName()
 	{
